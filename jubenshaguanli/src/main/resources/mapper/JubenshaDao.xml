@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.JubenshaDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.jubensha_name as jubenshaName
+        ,a.jubensha_photo as jubenshaPhoto
+        ,a.jubensha_kaishishijian as jubenshaKaishishijian
+        ,a.jubensha_shichang as jubenshaShichang
+        ,a.jubensha_types as jubenshaTypes
+        ,a.jubensha_kucun_number as jubenshaKucunNumber
+        ,a.jubensha_price as jubenshaPrice
+        ,a.jubensha_old_money as jubenshaOldMoney
+        ,a.jubensha_new_money as jubenshaNewMoney
+        ,a.jubensha_clicknum as jubenshaClicknum
+        ,a.shangxia_types as shangxiaTypes
+        ,a.jubensha_delete as jubenshaDelete
+        ,a.jubensha_content as jubenshaContent
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.JubenshaView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM jubensha  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.jubenshaName != '' and params.jubenshaName != null and params.jubenshaName != 'null' ">
+                and a.jubensha_name like CONCAT('%',#{params.jubenshaName},'%')
+            </if>
+            <if test=" params.jubenshaKaishishijian != '' and params.jubenshaKaishishijian != null and params.jubenshaKaishishijian != 'null' ">
+                and a.jubensha_kaishishijian like CONCAT('%',#{params.jubenshaKaishishijian},'%')
+            </if>
+            <if test=" params.jubenshaShichang != '' and params.jubenshaShichang != null and params.jubenshaShichang != 'null' ">
+                and a.jubensha_shichang like CONCAT('%',#{params.jubenshaShichang},'%')
+            </if>
+            <if test="params.jubenshaTypes != null and params.jubenshaTypes != ''">
+                and a.jubensha_types = #{params.jubenshaTypes}
+            </if>
+            <if test="params.jubenshaKucunNumberStart != null and params.jubenshaKucunNumberStart != ''">
+                <![CDATA[  and a.jubensha_kucun_number >= #{params.jubenshaKucunNumberStart}   ]]>
+            </if>
+            <if test="params.jubenshaKucunNumberEnd != null and params.jubenshaKucunNumberEnd != ''">
+                <![CDATA[  and a.jubensha_kucun_number <= #{params.jubenshaKucunNumberEnd}   ]]>
+            </if>
+             <if test="params.jubenshaKucunNumber != null and params.jubenshaKucunNumber != ''">
+                and a.jubensha_kucun_number = #{params.jubenshaKucunNumber}
+             </if>
+            <if test="params.jubenshaPriceStart != null and params.jubenshaPriceStart != ''">
+                <![CDATA[  and a.jubensha_price >= #{params.jubenshaPriceStart}   ]]>
+            </if>
+            <if test="params.jubenshaPriceEnd != null and params.jubenshaPriceEnd != ''">
+                <![CDATA[  and a.jubensha_price <= #{params.jubenshaPriceEnd}   ]]>
+            </if>
+             <if test="params.jubenshaPrice != null and params.jubenshaPrice != ''">
+                and a.jubensha_price = #{params.jubenshaPrice}
+             </if>
+            <if test="params.jubenshaOldMoneyStart != null ">
+                <![CDATA[  and a.jubensha_old_money >= #{params.jubenshaOldMoneyStart}   ]]>
+            </if>
+            <if test="params.jubenshaOldMoneyEnd != null ">
+                <![CDATA[  and a.jubensha_old_money <= #{params.jubenshaOldMoneyEnd}   ]]>
+            </if>
+            <if test="params.jubenshaNewMoneyStart != null ">
+                <![CDATA[  and a.jubensha_new_money >= #{params.jubenshaNewMoneyStart}   ]]>
+            </if>
+            <if test="params.jubenshaNewMoneyEnd != null ">
+                <![CDATA[  and a.jubensha_new_money <= #{params.jubenshaNewMoneyEnd}   ]]>
+            </if>
+            <if test="params.jubenshaClicknumStart != null and params.jubenshaClicknumStart != ''">
+                <![CDATA[  and a.jubensha_clicknum >= #{params.jubenshaClicknumStart}   ]]>
+            </if>
+            <if test="params.jubenshaClicknumEnd != null and params.jubenshaClicknumEnd != ''">
+                <![CDATA[  and a.jubensha_clicknum <= #{params.jubenshaClicknumEnd}   ]]>
+            </if>
+             <if test="params.jubenshaClicknum != null and params.jubenshaClicknum != ''">
+                and a.jubensha_clicknum = #{params.jubenshaClicknum}
+             </if>
+            <if test="params.shangxiaTypes != null and params.shangxiaTypes != ''">
+                and a.shangxia_types = #{params.shangxiaTypes}
+            </if>
+            <if test="params.jubenshaDeleteStart != null and params.jubenshaDeleteStart != ''">
+                <![CDATA[  and a.jubensha_delete >= #{params.jubenshaDeleteStart}   ]]>
+            </if>
+            <if test="params.jubenshaDeleteEnd != null and params.jubenshaDeleteEnd != ''">
+                <![CDATA[  and a.jubensha_delete <= #{params.jubenshaDeleteEnd}   ]]>
+            </if>
+             <if test="params.jubenshaDelete != null and params.jubenshaDelete != ''">
+                and a.jubensha_delete = #{params.jubenshaDelete}
+             </if>
+            <if test=" params.jubenshaContent != '' and params.jubenshaContent != null and params.jubenshaContent != 'null' ">
+                and a.jubensha_content like CONCAT('%',#{params.jubenshaContent},'%')
+            </if>
+
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>

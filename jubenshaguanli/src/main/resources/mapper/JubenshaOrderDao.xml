@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.JubenshaOrderDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.jubensha_order_uuid_number as jubenshaOrderUuidNumber
+        ,a.jubensha_id as jubenshaId
+        ,a.yonghu_id as yonghuId
+        ,a.yuyue_time as yuyueTime
+        ,a.buy_number as buyNumber
+        ,a.jubensha_order_true_price as jubenshaOrderTruePrice
+        ,a.jubensha_order_types as jubenshaOrderTypes
+        ,a.jubensha_order_payment_types as jubenshaOrderPaymentTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.JubenshaOrderView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,jubensha.jubensha_name as jubenshaName
+        ,jubensha.jubensha_photo as jubenshaPhoto
+        ,jubensha.jubensha_kaishishijian as jubenshaKaishishijian
+        ,jubensha.jubensha_shichang as jubenshaShichang
+        ,jubensha.jubensha_types as jubenshaTypes
+        ,jubensha.jubensha_kucun_number as jubenshaKucunNumber
+        ,jubensha.jubensha_price as jubenshaPrice
+        ,jubensha.jubensha_old_money as jubenshaOldMoney
+        ,jubensha.jubensha_new_money as jubenshaNewMoney
+        ,jubensha.jubensha_clicknum as jubenshaClicknum
+        ,jubensha.shangxia_types as shangxiaTypes
+        ,jubensha.jubensha_delete as jubenshaDelete
+        ,jubensha.jubensha_content as jubenshaContent
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.new_money as newMoney
+        ,yonghu.yonghu_sum_jifen as yonghuSumJifen
+        ,yonghu.yonghu_new_jifen as yonghuNewJifen
+        ,yonghu.huiyuandengji_types as huiyuandengjiTypes
+
+        FROM jubensha_order  a
+        left JOIN jubensha jubensha ON a.jubensha_id = jubensha.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.jubenshaOrderUuidNumber != '' and params.jubenshaOrderUuidNumber != null and params.jubenshaOrderUuidNumber != 'null' ">
+                and a.jubensha_order_uuid_number like CONCAT('%',#{params.jubenshaOrderUuidNumber},'%')
+            </if>
+            <if test="params.jubenshaId != null and params.jubenshaId != ''">
+                and (
+                    a.jubensha_id = #{params.jubenshaId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test=" params.yuyueTimeStart != '' and params.yuyueTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.yuyue_time) >= UNIX_TIMESTAMP(#{params.yuyueTimeStart}) ]]>
+            </if>
+            <if test=" params.yuyueTimeEnd != '' and params.yuyueTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.yuyue_time) <= UNIX_TIMESTAMP(#{params.yuyueTimeEnd}) ]]>
+            </if>
+            <if test="params.buyNumberStart != null and params.buyNumberStart != ''">
+                <![CDATA[  and a.buy_number >= #{params.buyNumberStart}   ]]>
+            </if>
+            <if test="params.buyNumberEnd != null and params.buyNumberEnd != ''">
+                <![CDATA[  and a.buy_number <= #{params.buyNumberEnd}   ]]>
+            </if>
+             <if test="params.buyNumber != null and params.buyNumber != ''">
+                and a.buy_number = #{params.buyNumber}
+             </if>
+            <if test="params.jubenshaOrderTruePriceStart != null ">
+                <![CDATA[  and a.jubensha_order_true_price >= #{params.jubenshaOrderTruePriceStart}   ]]>
+            </if>
+            <if test="params.jubenshaOrderTruePriceEnd != null ">
+                <![CDATA[  and a.jubensha_order_true_price <= #{params.jubenshaOrderTruePriceEnd}   ]]>
+            </if>
+            <if test="params.jubenshaOrderTypes != null and params.jubenshaOrderTypes != ''">
+                and a.jubensha_order_types = #{params.jubenshaOrderTypes}
+            </if>
+            <if test="params.jubenshaOrderPaymentTypes != null and params.jubenshaOrderPaymentTypes != ''">
+                and a.jubensha_order_payment_types = #{params.jubenshaOrderPaymentTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断剧本杀的id不为空 -->
+            <if test=" params.jubenshaIdNotNull != '' and params.jubenshaIdNotNull != null and params.jubenshaIdNotNull != 'null' ">
+                and a.jubensha_id IS NOT NULL
+            </if>
+            <if test=" params.jubenshaName != '' and params.jubenshaName != null and params.jubenshaName != 'null' ">
+                and jubensha.jubensha_name like CONCAT('%',#{params.jubenshaName},'%')
+            </if>
+            <if test=" params.jubenshaKaishishijian != '' and params.jubenshaKaishishijian != null and params.jubenshaKaishishijian != 'null' ">
+                and jubensha.jubensha_kaishishijian like CONCAT('%',#{params.jubenshaKaishishijian},'%')
+            </if>
+            <if test=" params.jubenshaShichang != '' and params.jubenshaShichang != null and params.jubenshaShichang != 'null' ">
+                and jubensha.jubensha_shichang like CONCAT('%',#{params.jubenshaShichang},'%')
+            </if>
+            <if test="params.jubenshaTypes != null  and params.jubenshaTypes != ''">
+                and jubensha.jubensha_types = #{params.jubenshaTypes}
+            </if>
+
+            <if test="params.jubenshaKucunNumberStart != null  and params.jubenshaKucunNumberStart != '' ">
+                <![CDATA[  and jubensha.jubensha_kucun_number >= #{params.jubenshaKucunNumberStart}   ]]>
+            </if>
+            <if test="params.jubenshaKucunNumberEnd != null  and params.jubenshaKucunNumberEnd != '' ">
+                <![CDATA[  and jubensha.jubensha_kucun_number <= #{params.jubenshaKucunNumberEnd}   ]]>
+            </if>
+            <if test="params.jubenshaKucunNumber != null  and params.jubenshaKucunNumber != '' ">
+                and jubensha.jubensha_kucun_number = #{params.jubenshaKucunNumber}
+            </if>
+            <if test="params.jubenshaPriceStart != null  and params.jubenshaPriceStart != '' ">
+                <![CDATA[  and jubensha.jubensha_price >= #{params.jubenshaPriceStart}   ]]>
+            </if>
+            <if test="params.jubenshaPriceEnd != null  and params.jubenshaPriceEnd != '' ">
+                <![CDATA[  and jubensha.jubensha_price <= #{params.jubenshaPriceEnd}   ]]>
+            </if>
+            <if test="params.jubenshaPrice != null  and params.jubenshaPrice != '' ">
+                and jubensha.jubensha_price = #{params.jubenshaPrice}
+            </if>
+            <if test="params.jubenshaOldMoneyStart != null ">
+                <![CDATA[  and jubensha.jubensha_old_money >= #{params.jubenshaOldMoneyStart}   ]]>
+            </if>
+            <if test="params.jubenshaOldMoneyEnd != null ">
+                <![CDATA[  and jubensha.jubensha_old_money <= #{params.jubenshaOldMoneyEnd}   ]]>
+            </if>
+            <if test="params.jubenshaNewMoneyStart != null ">
+                <![CDATA[  and jubensha.jubensha_new_money >= #{params.jubenshaNewMoneyStart}   ]]>
+            </if>
+            <if test="params.jubenshaNewMoneyEnd != null ">
+                <![CDATA[  and jubensha.jubensha_new_money <= #{params.jubenshaNewMoneyEnd}   ]]>
+            </if>
+            <if test="params.jubenshaClicknumStart != null  and params.jubenshaClicknumStart != '' ">
+                <![CDATA[  and jubensha.jubensha_clicknum >= #{params.jubenshaClicknumStart}   ]]>
+            </if>
+            <if test="params.jubenshaClicknumEnd != null  and params.jubenshaClicknumEnd != '' ">
+                <![CDATA[  and jubensha.jubensha_clicknum <= #{params.jubenshaClicknumEnd}   ]]>
+            </if>
+            <if test="params.jubenshaClicknum != null  and params.jubenshaClicknum != '' ">
+                and jubensha.jubensha_clicknum = #{params.jubenshaClicknum}
+            </if>
+            <if test="params.shangxiaTypes != null  and params.shangxiaTypes != ''">
+                and jubensha.shangxia_types = #{params.shangxiaTypes}
+            </if>
+
+            <if test="params.jubenshaDeleteStart != null  and params.jubenshaDeleteStart != '' ">
+                <![CDATA[  and jubensha.jubensha_delete >= #{params.jubenshaDeleteStart}   ]]>
+            </if>
+            <if test="params.jubenshaDeleteEnd != null  and params.jubenshaDeleteEnd != '' ">
+                <![CDATA[  and jubensha.jubensha_delete <= #{params.jubenshaDeleteEnd}   ]]>
+            </if>
+            <if test="params.jubenshaDelete != null  and params.jubenshaDelete != '' ">
+                and jubensha.jubensha_delete = #{params.jubenshaDelete}
+            </if>
+            <if test=" params.jubenshaContent != '' and params.jubenshaContent != null and params.jubenshaContent != 'null' ">
+                and jubensha.jubensha_content like CONCAT('%',#{params.jubenshaContent},'%')
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and yonghu.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and yonghu.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+            <if test="params.yonghuSumJifenStart != null ">
+                <![CDATA[  and yonghu.yonghu_sum_jifen >= #{params.yonghuSumJifenStart}   ]]>
+            </if>
+            <if test="params.yonghuSumJifenEnd != null ">
+                <![CDATA[  and yonghu.yonghu_sum_jifen <= #{params.yonghuSumJifenEnd}   ]]>
+            </if>
+            <if test="params.yonghuNewJifenStart != null ">
+                <![CDATA[  and yonghu.yonghu_new_jifen >= #{params.yonghuNewJifenStart}   ]]>
+            </if>
+            <if test="params.yonghuNewJifenEnd != null ">
+                <![CDATA[  and yonghu.yonghu_new_jifen <= #{params.yonghuNewJifenEnd}   ]]>
+            </if>
+            <if test="params.huiyuandengjiTypes != null  and params.huiyuandengjiTypes != ''">
+                and yonghu.huiyuandengji_types = #{params.huiyuandengjiTypes}
+            </if>
+
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
